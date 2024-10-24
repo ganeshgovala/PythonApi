@@ -1,0 +1,26 @@
+# Python-related files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.db
+
+# Environment variables
+.env
+
+# VS Code files
+.vscode/
+
+# Compiled files
+*.egg-info/
+*.egg
+
+# Ignore any .DS_Store files (macOS)
+.DS_Store
+
+# Ignore any log files
+*.log
+
+# Ignore virtual environments
+venv/
+env/
