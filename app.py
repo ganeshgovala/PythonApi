@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request #type: ignore
 from flask_cors import CORS # type: ignore
+import os
 
 from selenium import webdriver #type: ignore
 from selenium.webdriver.chrome.service import Service #type: ignore
