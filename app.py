@@ -9,6 +9,7 @@ from selenium.webdriver.support import expected_conditions as EC #type: ignore
 from selenium.webdriver.common.by import By #type: ignore
 from selenium.webdriver.support.ui import Select #type: ignore
 from selenium.webdriver.chrome.options import Options #type: ignore
+from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 import time
 
@@ -16,15 +17,25 @@ import time
 app = Flask(__name__)
 CORS(app)
 
-def openWebsite() :
-    path = 'C:\\Users\\srira\\Downloads\\chromedriver-2\\chromedriver-win64\\chromedriver.exe'
+def openWebsite():
+    print("open website function called")
+    path = '/usr/bin/chromedriver'  # Relative path
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Use shared memory
+    chrome_options.add_argument("--disable-gpu")  # Disable GPU, useful in headless
+    chrome_options.add_argument("--no-sandbox")  # Necessary in containerized environments
+
     website = 'https://vishnu.ac.in/Default.aspx?ReturnUrl=%2f'
     service = Service(executable_path=path)
-    driver = webdriver.Chrome(service = service)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get(website)
+    print("open website function completed")
     return driver
 
+
 def login(driver, username, password) :
+    print("login function called")
     wait = WebDriverWait(driver, 10)
     input_field = wait.until(EC.visibility_of_element_located((By.ID, 'txtId2')))
     password_field = wait.until(EC.visibility_of_element_located((By.ID, 'txtPwd2')))
@@ -32,6 +43,7 @@ def login(driver, username, password) :
     input_field.send_keys(username)
     password_field.send_keys(password)
     login_btn.click()
+    print("login function completed")
     return wait
 
 @app.route('/')
@@ -138,15 +150,20 @@ def sub_wise_till_now() :
 def updateData() :
     driver = openWebsite()
     data = request.json
-    username = data.get('username')
-    password = data.get('password')
+    # username = data.get('username')
+    # password = data.get('password')
+    username = '23pa1a0564'
+    password = 'qwertyuiop'
     wait = login(driver, username, password)
 
-    WebDriverWait(driver, 3).until(EC.alert_is_present())
-    alert = driver.switch_to.alert
-    alert.accept()
-
-    return common(wait, driver)
+    try:
+        WebDriverWait(driver, 10).until(EC.alert_is_present())
+        alert = driver.switch_to.alert
+        alert.accept()  # Or whatever action you need
+        return common(wait, driver)
+    except :
+        driver.quit()
+        print("Alert not found within the specified time")
 
 
 @app.route('/getAttendance', methods=['POST'])
@@ -159,21 +176,25 @@ def getAttendanceTillNow() :
     time.sleep(3)
 
     try :
+        print("waiting for alert")
         WebDriverWait(driver, 3).until(EC.alert_is_present())
         alert = driver.switch_to.alert
         alert.accept()
+        print("accepting alert")
         dashboard = wait.until(EC.visibility_of_element_located((By.ID, 'imgHead')))
         return common(wait, driver)
     except :
         try :
             error = EC.visibility_of_element_located((By.ID, 'lblError1'))
             print("Invalid Email");
+            driver.quit()
             return jsonify(message = "Invalid")
         except :
+            driver.quit()
             return jsonify(message = "Error")
 
 def common(wait, driver) :
-    print("Called")
+    print("common function called")
     username_element = wait.until(EC.visibility_of_element_located((By.ID, 'lblUser')))
     username = username_element.text
 
@@ -223,8 +244,8 @@ def common(wait, driver) :
         "this_month" : str(this_month_data[3]),
         "this_month_attended" : str(this_month_data[2]) + " / " + str(this_month_data[1])
     }
+    print(result)
     return jsonify(message = result)
 
 if __name__ == "__main__":
-    from waitress import serve
-    serve(app, host="0.0.0.0", port=5000)
+    app.run(host="127.0.0.1", port=5000, debug=True)
