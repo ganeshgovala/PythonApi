@@ -150,10 +150,8 @@ def sub_wise_till_now() :
 def updateData() :
     driver = openWebsite()
     data = request.json
-    # username = data.get('username')
-    # password = data.get('password')
-    username = '23pa1a0564'
-    password = 'qwertyuiop'
+    username = data.get('username')
+    password = data.get('password')
     wait = login(driver, username, password)
 
     try:
@@ -164,6 +162,7 @@ def updateData() :
     except :
         driver.quit()
         print("Alert not found within the specified time")
+        return "Alert not found within the specified time"
 
 
 @app.route('/getAttendance', methods=['POST'])
