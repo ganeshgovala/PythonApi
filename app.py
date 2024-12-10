@@ -36,7 +36,7 @@ def openWebsite():
 
 def login(driver, username, password) :
     print("login function called")
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, 15)
     input_field = wait.until(EC.visibility_of_element_located((By.ID, 'txtId2')))
     password_field = wait.until(EC.visibility_of_element_located((By.ID, 'txtPwd2')))
     login_btn = wait.until(EC.visibility_of_element_located((By.ID, 'imgBtn2')))
@@ -155,14 +155,14 @@ def updateData() :
     wait = login(driver, username, password)
 
     try:
-        WebDriverWait(driver, 10).until(EC.alert_is_present())
+        WebDriverWait(driver, 15).until(EC.alert_is_present())
         alert = driver.switch_to.alert
         alert.accept()  # Or whatever action you need
         return common(wait, driver)
     except :
         driver.quit()
         print("Alert not found within the specified time")
-        return "Alert not found within the specified time"
+        return {"Alert not found within the specified time"}
 
 
 @app.route('/getAttendance', methods=['POST'])
