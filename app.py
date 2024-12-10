@@ -162,7 +162,7 @@ def updateData() :
     except :
         driver.quit()
         print("Alert not found within the specified time")
-        return {"Alert not found within the specified time"}
+        return jsonify(messsage="Alert not found within the specified time")
 
 
 @app.route('/getAttendance', methods=['POST'])
